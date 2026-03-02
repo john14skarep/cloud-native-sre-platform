@@ -21,19 +21,19 @@ jobs:
         working-directory: ./terraform
 
     steps:
-      - uses: Configure AWS credentials (OIDC)
-
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::753675398606:role/GitHubActions-OIDC-CloudNativeSRE
+    - name: Configure AWS credentials (OIDC)
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::753675398606:role/GitHubActions-OIDC-CloudNativeSRE
+        aws-region: us-east-1
           
 
 
-      - uses: hashicorp/setup-terraform@v3
+    - uses: hashicorp/setup-terraform@v3
 
-      - run: terraform init
-      - run: terraform validate
-      - run: terraform apply -auto-approve
+    - run: terraform init
+    - run: terraform validate
+    - run: terraform apply -auto-approve
 
   deploy:
     runs-on: ubuntu-latest

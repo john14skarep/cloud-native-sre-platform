@@ -6,6 +6,13 @@ on:
       - main
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+      
   terraform:
     runs-on: ubuntu-latest
 
@@ -14,13 +21,13 @@ jobs:
         working-directory: ./terraform
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: Configure AWS credentials (OIDC)
 
-      - uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: arn:aws:iam::753675398606:role/GitHubActions-OIDC-CloudNativeSRE
+          
+
 
       - uses: hashicorp/setup-terraform@v3
 

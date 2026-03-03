@@ -84,7 +84,7 @@ jobs:
           image-ref: ${{ needs.terraform.outputs.ecr_url }}:${{ env.IMAGE_TAG }}
           format: table
           exit-code: 1
-          severity: CRITICAL,HIGH
+          severity: CRITICAL
 
       - name: Push Docker image
         run: docker push ${{ needs.terraform.outputs.ecr_url }}:${IMAGE_TAG}

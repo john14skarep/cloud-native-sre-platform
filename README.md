@@ -1,152 +1,169 @@
-🚀 Cloud-Native SRE Platform 
+🚀 Cloud-Native SRE Platform
+Enterprise-Grade CI/CD, Security & Infrastructure Automation
 
-Enterprise-Grade CI/CD & Infrastructure Automation 
+Developed by: John Robles
+Role: Cloud / DevOps / SRE Engineer
 
-Developed by: John Robles | Role: Cloud / DevOps Engineer 
+📌 Executive Summary
 
- 
+This repository implements a production-oriented SRE ecosystem leveraging Infrastructure as Code (IaC), secure federated authentication, and automated delivery pipelines.
 
-📌 Executive Summary 
+The platform automates the full lifecycle of a containerized Node.js application:
 
-This repository implements a production-ready SRE ecosystem leveraging Infrastructure as Code (IaC) and automated delivery pipelines. The platform automates the lifecycle of a containerized Node.js application, from infrastructure provisioning on AWS to secure image distribution via Amazon ECR. 
+Infrastructure provisioning via Terraform
 
-The architecture emphasizes idempotency, security, and scalability, simulating a high-availability corporate DevOps environment. 
+Remote state management in AWS S3
 
- 
+Secure GitHub → AWS authentication using OIDC
 
-🏗 System Architecture 
+Container image build, vulnerability scanning, and versioned publishing to Amazon ECR
 
-The platform follows a modular design where infrastructure and application layers are decoupled but synchronized via GitHub Actions. 
+The architecture emphasizes:
 
-Developer pushes code to main. 
+Idempotency
 
-GitHub Actions triggers the CI/CD Pipeline. 
+Security-first CI/CD
 
-Terraform provisions/updates AWS Infrastructure (ECR, S3). 
+Traceability
 
-Docker builds and tags the production image. 
+Infrastructure immutability
 
-Amazon ECR stores the versioned container image. 
+🏗 System Architecture
 
- 
+Developer → GitHub Push → GitHub Actions → Terraform (IaC) → Docker Build → Trivy Scan → Amazon ECR
 
-🛠 Technical Stack 
+Flow Breakdown
 
-Category 
+Code pushed to main
 
-Technology 
+GitHub Actions triggers pipeline
 
-Purpose 
+Terraform provisions / updates:
 
-Cloud Provider 
+Amazon ECR
 
-AWS 
+S3 remote backend
 
-Managed services (ECR, S3, IAM). 
+Docker builds image
 
-IaC 
+Trivy scans image for CRITICAL vulnerabilities
 
-Terraform 
+Image tagged using commit SHA
 
-Resource provisioning and remote state management. 
+Secure push to ECR
 
-Runtime 
+🛠 Technical Stack
+Category	Technology	Purpose
+Cloud	AWS	ECR, S3, IAM
+IaC	Terraform	Infrastructure provisioning
+Runtime	Node.js / Express	Backend API
+Container	Docker	Application packaging
+CI/CD	GitHub Actions	Automation pipeline
+Security	OIDC + STS	Federated AWS authentication
+Security Scan	Trivy	Container vulnerability detection
+📂 Project Structure
+cloud-native-sre-platform/
+├── .github/workflows/
+│   └── deploy.yml        # Unified CI/CD pipeline
+├── app/                  # Node.js application
+├── terraform/
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   ├── provider.tf
+│   └── backend.tf        # S3 remote state backend
+├── Dockerfile
+└── package.json
+🔁 CI/CD Pipeline Design
+1️⃣ Infrastructure Stage
 
-Node.js / Express 
+terraform init
 
-High-performance backend application layer. 
+terraform validate
 
-Containerization 
+terraform apply
 
-Docker 
+Capture repository_url as workflow output
 
-Multi-stage builds for optimized image footprints. 
+Remote state is stored in encrypted S3 backend.
 
-CI/CD 
+2️⃣ Application & Security Stage
 
-GitHub Actions 
+Docker build
 
-Automated orchestration of IaC and deployment. 
+Commit-based SHA tagging
 
- 
+Trivy security scan (blocks CRITICAL vulnerabilities)
 
-📂 Project Structure 
+Secure OIDC authentication with AWS
 
-cloud-native-sre-platform/ 
-├── .github/workflows/    # CI/CD pipeline definitions (YAML) 
-├── app/                  # Application source code (Node.js) 
-├── terraform/            # Infrastructure as Code 
-│   ├── main.tf           # Resource definitions (ECR, S3) 
-│   ├── variables.tf      # Input configurations 
-│   ├── outputs.tf        # Infrastructure metadata 
-│   └── provider.tf       # AWS & Backend configuration 
-├── Dockerfile            # Multi-stage container build 
-└── package.json          # Dependency management 
- 
- 
-🔁 **CI/CD Pipeline Workflow** 
-The pipeline is triggered on every push to the main branch, executing two primary stages: 
- 
-1. **Infrastructure Stage (Terraform)** 
-Init & Validate: Configures the S3 remote backend and checks HCL syntax. 
- 
-Auto-Provisioning: Executes terraform apply --auto-approve to ensure the environment is ready. 
- 
-State Management: S3-backed state with encryption to ensure team collaboration. 
- 
-2. **Application Stage (Docker & ECR)** 
-Build: Compiles the application into a production-optimized image. 
- 
-Auth: Establishes a secure session with Amazon ECR via GitHub Secrets. 
- 
-Push: Tags and uploads the image to the private registry. 
- 
-🔐 **Security & Best Practices** 
-Zero-Secrets Policy: No credentials hardcoded; managed via GitHub Actions Secrets. 
- 
-Least Privilege: IAM policies scoped strictly to required ECR and S3 actions. 
- 
-State Integrity: S3 backend is encrypted and versioned. 
- 
-Immutable Infrastructure: Every deployment creates a new, versioned artifact. 
- 
-🚀 **Getting Started** 
-**Local Development** 
- 
-# Install dependencies 
-npm install 
- 
-# Start application 
-node app/index.js 
- 
-**Docker Execution** 
- 
-# Build the image 
-docker build -t cloud-native-platform . 
- 
-# Run the container 
-docker run -p 3000:3000 cloud-native-platform 
- 
-📈 Roadmap & Future Enhancements 
-[ ] Orchestration: Deploy containers to AWS ECS (Fargate). 
- 
-[ ] State Locking: Integrate DynamoDB for Terraform state locking. 
- 
-[ ] Security Scanning: Integrate Trivy for container vulnerability assessments. 
- 
-[ ] Observability: Implement CloudWatch dashboards and health checks. 
- 
-🎯 Key Demonstrations 
-✔ Infrastructure as Code (Terraform) 
- 
-✔ Remote State Management (S3 Backend) 
- 
-✔ CI/CD Orchestration (GitHub Actions) 
- 
-✔ Containerized Workloads (Docker) 
- 
-✔ Secure Cloud Auth (IAM / Secrets) 
- 
-Contact: John Robles 
- 
-Cloud / DevOps Engineering | Infrastructure Automation | SRE 
+Push image to ECR
+
+Example image tag:
+
+753675398606.dkr.ecr.us-east-1.amazonaws.com/cloud-native-sre-platform-iac:3cfff2b
+🔐 Security Architecture
+Federated Identity (OIDC)
+
+Instead of static access keys:
+
+GitHub requests temporary token
+
+AWS STS validates trust policy
+
+Temporary credentials issued
+
+No long-lived secrets stored
+
+Container Hardening
+
+CRITICAL vulnerability blocking enabled
+
+Dependencies regularly updated
+
+Image tagged immutably via commit SHA
+
+IAM Least Privilege
+
+Role permissions scoped strictly to:
+
+ECR push
+
+S3 backend access
+
+🚀 Local Development
+Install Dependencies
+npm install
+Run Application
+node app/index.js
+Docker Build
+docker build -t cloud-native-sre-platform .
+docker run -p 3000:3000 cloud-native-sre-platform
+📈 Roadmap
+
+✅ Remote S3 Backend
+✅ OIDC Federated Authentication
+✅ SHA-Based Image Versioning
+✅ Trivy Security Scanning
+
+⬜ Terraform Plan Enforcement
+⬜ Multi-Environment (dev/prod)
+⬜ DynamoDB State Locking
+⬜ ECS Fargate Deployment
+⬜ Monitoring & Observability
+
+🎯 Demonstrated SRE Concepts
+
+✔ Infrastructure as Code
+✔ Remote State Management
+✔ Secure Federated Authentication
+✔ Immutable Deployments
+✔ CI/CD Orchestration
+✔ Container Security Enforcement
+✔ Image Traceability via SHA
+
+👤 Author
+
+John Robles
+Cloud / DevOps / SRE Engineering
+Infrastructure Automation | CI/CD | Secure Cloud Architecture

@@ -44,7 +44,7 @@ jobs:
         run: terraform plan
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -var-file=environments/dev.tfvars
 
       - name: Capture Terraform output
         id: tf_outputs

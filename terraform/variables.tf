@@ -9,3 +9,13 @@ variable "project_name" {
   type        = string
   default     = "cloud-native-sre-platform-iac"
 }
+
+variable "environment" {
+  description = "Deployment environment"
+  type        = string
+}
+
+variable "ecr_repo_name" {
+  description = "Name of the ECR repository"
+  type        = string
+}

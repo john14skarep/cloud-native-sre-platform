@@ -3,6 +3,7 @@ terraform {
     bucket         = "cloud-native-sre-platform-tfstate-14101999"
     key            = "global/sre-platform/terraform.tfstate"
     region         = "us-east-1"
+    dynamodb_table = "terraform-lock-table"
     encrypt        = true
   }
 }
@@ -10,3 +11,4 @@ terraform {
 provider "aws" {
   region = var.aws_region
 }
+

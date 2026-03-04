@@ -15,3 +15,4 @@ resource "aws_ecr_repository" "app_repo" {
 #resource "aws_s3_bucket" "test_bucket" {
 #  bucket = "${var.project_name}-test-bucket-123456141099"
 #}
+

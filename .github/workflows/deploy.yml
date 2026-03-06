@@ -95,3 +95,11 @@ jobs:
       - name: Push Docker image
         run: docker push ${{ needs.terraform.outputs.ecr_url }}:${IMAGE_TAG}
 
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service \
+            --cluster sre-cluster \
+            --service sre-service \
+            --force-new-deployment \
+            --region us-east-1
+

@@ -139,10 +139,18 @@ resource "aws_ecs_task_definition" "sre_task" {
           hostPort      = 3000
         }
       ]
+
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = "/ecs/sre-platform"
+          awslogs-region        = "us-east-1"
+          awslogs-stream-prefix = "ecs"
+        }
+      }
     }
   ])
 }
-
 resource "aws_ecs_service" "sre_service" {
   name            = "sre-service"
   cluster         = aws_ecs_cluster.sre_cluster.id
@@ -168,3 +176,9 @@ resource "aws_ecs_service" "sre_service" {
 
   depends_on = [aws_lb_listener.sre_listener]
 }
+
+resource "aws_cloudwatch_log_group" "ecs_logs" {
+  name              = "/ecs/sre-platform"
+  retention_in_days = 7
+}
+

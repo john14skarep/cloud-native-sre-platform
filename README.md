@@ -1,169 +1,271 @@
 🚀 Cloud-Native SRE Platform
-Enterprise-Grade CI/CD, Security & Infrastructure Automation
 
-Developed by: John Robles
+Enterprise-Grade CI/CD, Infrastructure as Code & Cloud Deployment
+
+Author: John Robles
 Role: Cloud / DevOps / SRE Engineer
 
 📌 Executive Summary
 
-This repository implements a production-oriented SRE ecosystem leveraging Infrastructure as Code (IaC), secure federated authentication, and automated delivery pipelines.
+This repository demonstrates a cloud-native DevOps platform implementing secure CI/CD, infrastructure automation, and container orchestration on AWS.
 
-The platform automates the full lifecycle of a containerized Node.js application:
+The project automates the complete lifecycle of a containerized Node.js application, including:
 
-Infrastructure provisioning via Terraform
+Infrastructure provisioning with Terraform
 
-Remote state management in AWS S3
+Secure authentication between GitHub and AWS via OIDC
 
-Secure GitHub → AWS authentication using OIDC
+Automated Docker image build and security scanning
 
-Container image build, vulnerability scanning, and versioned publishing to Amazon ECR
+Versioned container publishing to Amazon ECR
 
-The architecture emphasizes:
+Deployment to AWS ECS Fargate
 
-Idempotency
+External access through an Application Load Balancer
 
-Security-first CI/CD
+Centralized logging with CloudWatch
 
-Traceability
+The architecture follows modern DevOps and SRE principles:
 
-Infrastructure immutability
+Infrastructure as Code
+
+Immutable deployments
+
+Federated authentication
+
+Continuous delivery
+
+Observability
 
 🏗 System Architecture
-
-Developer → GitHub Push → GitHub Actions → Terraform (IaC) → Docker Build → Trivy Scan → Amazon ECR
-
-Flow Breakdown
-
-Code pushed to main
-
-GitHub Actions triggers pipeline
-
-Terraform provisions / updates:
-
+Developer
+   ↓
+GitHub Push
+   ↓
+GitHub Actions CI/CD
+   ↓
+Terraform Infrastructure Provisioning
+   ↓
+Docker Image Build
+   ↓
+Trivy Security Scan
+   ↓
 Amazon ECR
-
-S3 remote backend
-
-Docker builds image
-
-Trivy scans image for CRITICAL vulnerabilities
-
-Image tagged using commit SHA
-
-Secure push to ECR
-
+   ↓
+AWS ECS Fargate
+   ↓
+Application Load Balancer
+   ↓
+CloudWatch Logs
 🛠 Technical Stack
 Category	Technology	Purpose
-Cloud	AWS	ECR, S3, IAM
+Cloud	AWS	Infrastructure platform
 IaC	Terraform	Infrastructure provisioning
-Runtime	Node.js / Express	Backend API
-Container	Docker	Application packaging
-CI/CD	GitHub Actions	Automation pipeline
-Security	OIDC + STS	Federated AWS authentication
-Security Scan	Trivy	Container vulnerability detection
+Runtime	Node.js / Express	Backend service
+Containerization	Docker	Application packaging
+Container Registry	Amazon ECR	Image storage
+Orchestration	ECS Fargate	Container runtime
+Networking	Application Load Balancer	Public access
+CI/CD	GitHub Actions	Automated pipeline
+Security	OIDC + AWS STS	Secretless authentication
+Security Scan	Trivy	Container vulnerability scanning
+Observability	CloudWatch Logs	Container log monitoring
 📂 Project Structure
-cloud-native-sre-platform/
+cloud-native-sre-platform
+│
 ├── .github/workflows/
-│   └── deploy.yml        # Unified CI/CD pipeline
-├── app/                  # Node.js application
+│   └── deploy.yml          # CI/CD pipeline
+│
+├── app/                    # Node.js application
+│
 ├── terraform/
 │   ├── main.tf
+│   ├── ecs.tf
 │   ├── variables.tf
 │   ├── outputs.tf
 │   ├── provider.tf
-│   └── backend.tf        # S3 remote state backend
+│   └── environments/
+│
 ├── Dockerfile
 └── package.json
-🔁 CI/CD Pipeline Design
+🔁 CI/CD Pipeline
+
+The pipeline is triggered on every push to the main branch.
+
 1️⃣ Infrastructure Stage
-
 terraform init
-
 terraform validate
-
+terraform plan
 terraform apply
 
-Capture repository_url as workflow output
+Infrastructure deployed:
 
-Remote state is stored in encrypted S3 backend.
+Amazon ECR
 
-2️⃣ Application & Security Stage
+ECS Cluster
+
+ECS Service
+
+Application Load Balancer
+
+VPC & networking
+
+CloudWatch Log Group
+
+Remote state:
+
+S3 backend
+DynamoDB state locking
+2️⃣ Application Stage
+Docker build
+Image tagging using commit SHA
+Trivy vulnerability scan
+Push to Amazon ECR
+
+Example image:
+
+753675398606.dkr.ecr.us-east-1.amazonaws.com/cloud-native-sre-platform-dev:3cfff2b
+3️⃣ Deployment Stage
+
+After pushing the image:
+
+aws ecs update-service --force-new-deployment
+
+This triggers automatic ECS redeployment.
+
+🔐 Security Architecture
+Federated Authentication (OIDC)
+
+Instead of static AWS credentials:
+
+GitHub → OIDC token
+AWS STS → temporary credentials
+Terraform / CI/CD operations
+
+Benefits:
+
+No stored AWS keys
+
+Temporary credentials
+
+Secure identity federation
+
+Container Security
+
+Security implemented through:
+
+Trivy vulnerability scanning
+
+CRITICAL vulnerability detection
+
+Immutable image tagging
+
+Minimal container footprint
+
+📊 Observability
+
+Container logs are automatically sent to:
+
+AWS CloudWatch Logs
+
+Log group:
+
+/ecs/sre-platform
+
+This enables:
+
+Runtime debugging
+
+Operational monitoring
+
+Production visibility
+
+🌐 Live Deployment Example
+
+Example response from the deployed service:
+
+{
+  "message": "Cloud Native SRE Platform Running",
+  "status": "healthy"
+}
+
+The application is deployed behind:
+
+AWS Application Load Balancer
+→ ECS Fargate
+→ Docker container
+🚀 Local Development
+
+Install dependencies
+
+npm install
+
+Run locally
+
+node app/index.js
 
 Docker build
 
-Commit-based SHA tagging
-
-Trivy security scan (blocks CRITICAL vulnerabilities)
-
-Secure OIDC authentication with AWS
-
-Push image to ECR
-
-Example image tag:
-
-753675398606.dkr.ecr.us-east-1.amazonaws.com/cloud-native-sre-platform-iac:3cfff2b
-🔐 Security Architecture
-Federated Identity (OIDC)
-
-Instead of static access keys:
-
-GitHub requests temporary token
-
-AWS STS validates trust policy
-
-Temporary credentials issued
-
-No long-lived secrets stored
-
-Container Hardening
-
-CRITICAL vulnerability blocking enabled
-
-Dependencies regularly updated
-
-Image tagged immutably via commit SHA
-
-IAM Least Privilege
-
-Role permissions scoped strictly to:
-
-ECR push
-
-S3 backend access
-
-🚀 Local Development
-Install Dependencies
-npm install
-Run Application
-node app/index.js
-Docker Build
-docker build -t cloud-native-sre-platform .
-docker run -p 3000:3000 cloud-native-sre-platform
+docker build -t cloud-native-platform .
+docker run -p 3000:3000 cloud-native-platform
 📈 Roadmap
 
-✅ Remote S3 Backend
-✅ OIDC Federated Authentication
-✅ SHA-Based Image Versioning
-✅ Trivy Security Scanning
+Completed:
 
-⬜ Terraform Plan Enforcement
-⬜ Multi-Environment (dev/prod)
-⬜ DynamoDB State Locking
-⬜ ECS Fargate Deployment
-⬜ Monitoring & Observability
+Terraform IaC
 
-🎯 Demonstrated SRE Concepts
+Remote state (S3 + DynamoDB)
 
-✔ Infrastructure as Code
-✔ Remote State Management
-✔ Secure Federated Authentication
-✔ Immutable Deployments
-✔ CI/CD Orchestration
-✔ Container Security Enforcement
-✔ Image Traceability via SHA
+OIDC authentication
+
+Container security scanning
+
+ECS Fargate deployment
+
+Application Load Balancer
+
+CloudWatch logging
+
+CI/CD automation
+
+Potential future improvements:
+
+Blue/Green deployments
+
+Canary deployments
+
+Prometheus / Grafana monitoring
+
+Autoscaling policies
+
+Multi-environment promotion (dev → prod)
+
+🎯 Demonstrated DevOps / SRE Skills
+
+✔ Infrastructure as Code (Terraform)
+✔ Secure CI/CD pipelines
+✔ OIDC Federated Authentication
+✔ Containerized workloads (Docker)
+✔ AWS ECS Fargate orchestration
+✔ Load balancing and networking
+✔ Container security scanning
+✔ Observability and centralized logging
+✔ Immutable deployments with versioned images
 
 👤 Author
 
 John Robles
+
 Cloud / DevOps / SRE Engineering
-Infrastructure Automation | CI/CD | Secure Cloud Architecture
+
+Specializing in:
+
+Infrastructure Automation
+
+CI/CD Pipelines
+
+Cloud Architecture
+
+Container Platforms
+
+Secure DevOps Workflows
